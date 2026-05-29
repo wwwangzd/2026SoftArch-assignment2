@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: hotel-pricing-agent
+  main:
+    web-application-type: none
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY:${DASHSCOPE_API_KEY:dry-run-placeholder}}
+      chat:
+        options:
+          model: ${AGENT_MODEL_NAME:qwen3-max}
+
+agent:
+  run-on-startup: true
+  model-mode: ${AGENT_MODEL_MODE:dry-run}
+  model-name: ${AGENT_MODEL_NAME:qwen3-max}
+  knowledge-resource: ${AGENT_KNOWLEDGE_RESOURCE:classpath:knowledge/prior-knowledge.md}
+  system-prompt-resource: ${AGENT_SYSTEM_PROMPT_RESOURCE:classpath:prompts/system-prompt.md}
+  iteration-prompt-resource: ${AGENT_ITERATION_PROMPT_RESOURCE:classpath:prompts/iteration-prompt.md}
+  self-verification-prompt-resource: ${AGENT_SELF_VERIFICATION_PROMPT_RESOURCE:classpath:prompts/self-verification-prompt.md}
+  log-dir: ${AGENT_LOG_DIR:../logs}
+  max-iterations: ${AGENT_MAX_ITERATIONS:4}

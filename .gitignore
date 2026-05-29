@@ -1,1 +1,5 @@
 .DS_Store
+.vscode
+
+# Generated runtime logs. Keep selected final logs manually if needed.
+logs/

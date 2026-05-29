@@ -1,117 +1,109 @@
 # Stage
 
-## 当前阶段
+## 当前阶段状态
 
-当前处于 **搭建 agent 阶段**。
+当前处于 **agent 工程边界与 prompt 语义调整阶段**。
 
-本阶段目标是使用 **Spring AI Alibaba** 搭建一个面向作业要求的 **Qwen3-Max single-agent**，为后续执行 ADD 3.0 四轮迭代、保存对话日志和生成英文报告素材做准备。
+本阶段目标是使用 **Spring AI Alibaba** 搭建面向作业要求的 **Qwen3-Max single-agent**，并为后续执行 ADD 3.0 四轮迭代、保存 conversation log、整理英文报告素材做准备。
 
-## 阶段依据
+## 本阶段已完成
 
-- 项目级约束：[AGENTS.md](AGENTS.md)
-- 作业英文原文：[docs/task.md](docs/task.md)
-- 中文理解版：[docs/task-cn.md](docs/task-cn.md)
+已创建 Spring Boot + Maven 工程：[hotel-pricing-agent](hotel-pricing-agent)。
 
-本阶段实现时，仍以 [docs/task.md](docs/task.md) 为权威依据。
+已完成的初始化内容：
 
-## 阶段目标
+1. 添加 Spring AI Alibaba 相关依赖。
+2. 配置 `qwen3-max` 模型入口，默认使用 `dry-run` 模式。
+3. 建立 `config / agent / prompt / knowledge / logging / report` 基础包结构。
+4. 实现 single-agent 编排骨架，不做一次性直接问答。
+5. 实现四轮 ADD 迭代顺序：
+   - Iteration 1: Establishing an Overall System Structure
+   - Iteration 2: Identifying Structures to Support Primary Functionality
+   - Iteration 3: Addressing Reliability and Availability Quality Attributes
+   - Iteration 4: Addressing Development and Operations
+6. 实现 system prompt 和 iteration prompt；self-reflection / self-verification 作为每轮迭代输出的一部分由模型完成。
+7. 已将 agent 先验知识移动到 [hotel-pricing-agent/src/main/resources/knowledge/prior-knowledge.md](hotel-pricing-agent/src/main/resources/knowledge/prior-knowledge.md)，作为 agent 工程内置能力资源，默认只注入：
+   - ADD 3.0
+   - Hotel Pricing System case study
+   - 四轮迭代计划
+8. 实现 conversation log 输出，包含时间戳、prompt、模型输出、耗时和 token 字段。
+9. 增加 dry-run client，用于无 API Key 时验证流程。
+10. 增加 DashScope client 入口，用于后续真实调用 Qwen3-Max。
+11. 增加运行说明：[hotel-pricing-agent/README.md](hotel-pricing-agent/README.md)。
 
-1. 搭建 Spring AI Alibaba 项目骨架。
-2. 接入 Qwen3-Max 模型调用能力。
-3. 实现 single-agent 主流程，而不是直接单次调用 LLM。
-4. 固化 system prompt、iteration prompt 和 self-reflection prompt 的生成方式。
-5. 将 [docs/task.md](docs/task.md) 中允许使用的 prior knowledge 注入 agent。
-6. 支持按四轮 ADD 迭代顺序运行。
-7. 记录完整交互日志，包括时间戳、输入、模型输出、self-reflection、耗时和 token 使用量。
-8. 为后续报告生成保留结构化输出。
+## 已验证内容
 
-## 阶段范围
+在 [hotel-pricing-agent](hotel-pricing-agent) 下已通过：
 
-本阶段需要重点完成：
+```bash
+mvn test
+mvn spring-boot:run
+```
 
-- Spring Boot / Spring AI Alibaba 基础工程。
-- Qwen3-Max 配置与调用封装。
-- agent 编排逻辑。
-- prompt 构造逻辑。
-- prior knowledge 加载逻辑。
-- conversation log 保存逻辑。
-- token 和耗时统计入口。
-- 一次可验证的本地运行流程。
+验证结果：
 
-本阶段暂不要求完成：
+- Spring Boot 测试通过。
+- dry-run 模式可启动。
+- 可读取 agent classpath 内置知识 `knowledge/prior-knowledge.md`。
+- 可按四轮 ADD 迭代生成请求。
+- 每轮迭代输出内包含 self-reflection / self-verification 要求。
+- 可生成 conversation log 到 `logs/`。
+- 代码中没有硬编码 API Key。
+- 已验证 `DASHSCOPE_API_KEY` 在本地 shell 中存在。
+- 已执行过 1 轮真实 Qwen3-Max smoke test，确认 DashScope 调用链路可用。
+- 暂停执行完整 4 轮真实运行，等待进一步确认 prompt、先验知识边界和 reflection 形式。
 
-- 最终英文报告全文。
-- 最终 ADD 架构设计结果定稿。
-- 小组成员个人反思内容。
-- 最终提交包整理。
+说明：`logs/` 已在根目录 `.gitignore` 中忽略，避免 dry-run 日志混入提交。后续真实运行产生的最终日志应单独整理到交付材料中。
 
-## Agent 行为要求
+## 当前保留约束
 
-agent 必须满足 [docs/task.md](docs/task.md) 中 Option 2 的要求：
+后续继续遵守 [AGENTS.md](AGENTS.md) 和 [docs/task.md](docs/task.md)：
 
-1. 使用 single-agent 方式完成任务。
-2. 通过 sequential reasoning 执行四轮 ADD 迭代。
-3. 每轮迭代后进行 self-reflection / self-verification。
-4. 只使用作业给定 prior knowledge，不引入外部领域知识。
-5. 不使用 few-shot 示例或手工演示输出。
-6. 不进行额外任务重新解释或需求扩展。
-7. 输出架构视图时使用 Mermaid 或 PlantUML 代码。
-8. 决策规则必须能追溯到 system instructions、ADD 步骤、drivers、concerns 或 constraints。
+1. 只能使用作业给定 prior knowledge；默认输入为 agent classpath 资源 `knowledge/prior-knowledge.md`。
+2. 不引入外部领域知识。
+3. 不使用 few-shot 示例或手工演示输出。
+4. 不额外扩展或重解释需求。
+5. 决策规则必须可追溯到 system instructions、ADD steps、drivers、concerns 或 constraints。
+6. 架构视图必须使用 Mermaid 或 PlantUML。
+7. 每轮迭代输出中必须包含 self-reflection / self-verification。
 
-## 推荐代码职责划分
+## 下一阶段
 
-后续目录可根据实际 Spring Boot 项目结构调整，但建议保持以下职责边界：
+下一阶段建议先进入 **prompt 确认阶段**，确认后再进入真实运行 ADD 迭代阶段。
 
-- `config`：模型、客户端、prompt 模板和运行参数配置。
-- `agent`：single-agent 主流程，包括四轮 ADD 迭代编排与 self-reflection。
-- `prompt`：system prompt、iteration prompt、reflection prompt 等提示词构造。
-- `knowledge`：从 [docs/task.md](docs/task.md) 抽取或整理 prior knowledge，不额外扩充外部知识。
-- `logging`：完整交互日志记录，包含时间戳、输入、模型输出、self-reflection、token 统计和耗时。
-- `report`：报告素材或报告生成辅助逻辑。
+主要任务：
 
-## 配置与安全要求
+1. 人工确认 [hotel-pricing-agent/src/main/resources/knowledge/prior-knowledge.md](hotel-pricing-agent/src/main/resources/knowledge/prior-knowledge.md) 是否只包含作业要求注入的三类先验知识。
+2. 人工确认 agent 工程中不出现不必要的作业描述；作业语境只保留在根目录协作文档中。
+3. 人工确认 `PromptBuilder` 中的 system prompt 是否只包含 task.md Option 2 明文要求。
+4. 确认 agent 编排方式是否符合 single-agent sequential reasoning + self-reflection：
+   - 程序负责按四轮顺序调用；
+   - 模型根据 system instruction 在每轮输出内执行任务分解、步骤规划和自我验证；
+   - conversation log 保存完整交互过程。
+5. 确认无误后，使用环境变量启动真实模型调用：
 
-- 不要在代码中硬编码 API Key、访问令牌或私密配置。
-- 模型名称、API Key、base URL 等运行配置应通过环境变量、本地配置文件或 Spring 配置机制注入。
-- 本地私密配置文件不应提交到仓库。
-- 需要记录实际使用模型为 `Qwen3-Max`。
-- 如果模型调用暂时不可用，应保证 agent 编排、prompt 构造和日志写入逻辑仍可通过 mock 或 dry-run 方式验证。
+```bash
+export AGENT_MODEL_MODE=dashscope
+cd hotel-pricing-agent
+mvn spring-boot:run
+```
 
-## 日志要求
+6. 保存真实 Qwen3-Max 生成的完整 conversation log。
+7. 检查每轮输出是否违反作业限制。
+8. 如有外部知识、缺少图、缺少 ADD 步骤或 self-reflection 不充分，调整 prompt 后重新运行。
+9. 从最终日志中整理 ADD 输出结果。
+10. 准备英文报告初稿，结构按 [docs/task.md](docs/task.md) Appendix。
 
-conversation log 应为后续交付物服务，至少记录：
+## 下一阶段验收标准
 
-- 运行开始和结束时间。
-- 使用模型。
-- 每轮 ADD iteration 名称。
-- human / system / agent 输入内容。
-- Qwen3-Max 原始输出。
-- self-reflection / self-verification 输出。
-- 每次调用耗时。
-- token 消耗，如果 API 响应可获得。
-- 错误信息和重试信息，如果发生。
+真实运行阶段完成时，应得到：
 
-日志格式应优先选择 Markdown、JSON 或 JSONL 中的一种，保证后续可以直接引用或自动处理。
-
-## 阶段验收标准
-
-本阶段完成时，应满足：
-
-1. 可以启动 Spring AI Alibaba agent 程序。
-2. 可以明确配置并调用或模拟调用 Qwen3-Max。
-3. 可以按四轮 ADD 迭代顺序生成请求。
-4. 每轮迭代都包含 self-reflection / self-verification 步骤。
-5. 可以生成完整 conversation log 文件。
-6. 日志中包含时间戳和阶段信息。
-7. 代码中没有硬编码密钥。
-8. README 或运行说明中能说明如何启动 agent。
-
-## 下一阶段预告
-
-agent 搭建完成后，建议进入 **运行 ADD 迭代阶段**：
-
-1. 使用真实 Qwen3-Max 执行四轮 ADD 迭代。
-2. 保存完整 conversation log。
-3. 检查输出是否违反外部知识限制。
-4. 整理 ADD 输出结果。
-5. 准备英文报告素材。
+1. 一份完整真实 conversation log，覆盖四轮 ADD 迭代和 self-reflection。
+2. 一份可用于报告的 ADD 输出结果材料。
+3. interaction cost analysis 所需信息：
+   - 完成方式：Single-Agent
+   - 使用模型：Qwen3-Max
+   - 人工交互轮次
+   - token 消耗，如果 API 返回
+   - 总耗时
+4. 对模型输出的合规检查记录。
