@@ -1,8 +1,8 @@
 # ADD Architecture Agent
 
-Spring AI Alibaba single-agent environment for human-led ADD-based architecture design.
+Spring AI Alibaba + Qwen3-Max single-agent CLI for human-led ADD architecture design.
 
-## Start The Agent
+## Run
 
 From the repository root:
 
@@ -12,17 +12,35 @@ export AGENT_MODEL_MODE=dashscope
 mvn spring-boot:run
 ```
 
-If your shell already exports `DASHSCOPE_API_KEY`, the application will use it. Otherwise set:
+The application reads `DASHSCOPE_API_KEY` first. If needed, set:
 
 ```bash
 export AI_DASHSCOPE_API_KEY=your_api_key
 ```
 
-The default model is `qwen3-max`. Each message is submitted by typing the prompt, then a line containing only `/send`. End the session with `/exit`.
+Each message is submitted by typing the prompt, then a line containing only `/send`. End the session with `/exit`.
 
-The conversation uses Spring AI in-memory chat memory for the current process. The conversation log is written to `../logs/`. It records the system prompt once, then records each submitted human message and model response with timestamps.
+## Log
 
-## Iteration Prompts
+Conversation logs are written to `../logs/`. A log records:
+
+- system prompt;
+- each submitted user prompt;
+- each model output;
+- timestamps;
+- final session total token count when provider usage metadata is available.
+
+## Interaction Prompts
+
+The CLI displays each stage name before input. Submit the following prompts in order.
+
+### Initial ADD Input Review
+
+```text
+Perform ADD Step 1 for the overall Hotel Pricing System.
+
+Review the provided inputs and identify the requirements considered architectural drivers. Keep this as a separate global input review before the four ADD design iterations. Do not produce iteration design results in this response. Use only the provided prior knowledge and follow the system instructions, including self-reflection and self-verification.
+```
 
 ### Iteration 1
 
@@ -55,5 +73,7 @@ Complete Iteration 4: Addressing Development and Operations.
 
 Use the previous iteration results as context. Use ADD 3.0 to produce the result for this iteration. Cover ADD Step 2 to ADD Step 7. Generate any architecture views using Mermaid or PlantUML code. Use only the provided prior knowledge and follow the system instructions, including self-reflection and self-verification.
 ```
+
+After the fourth iteration model response is complete, type `/exit`.
 
 Do not commit API keys or local private configuration files.

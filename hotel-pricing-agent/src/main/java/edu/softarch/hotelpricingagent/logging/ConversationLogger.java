@@ -56,6 +56,7 @@ public class ConversationLogger {
 	}
 
 	public void appendInteraction(ConversationLog log, AgentModelRequest request, AgentModelResponse response) {
+		log.recordResponse(response);
 		String text = """
 				## %s
 
@@ -82,7 +83,17 @@ public class ConversationLogger {
 	}
 
 	public void finish(ConversationLog log) {
-		append(log, "- Finished at: " + formatTime(Instant.now()) + "\n");
+		String text = """
+				## Session Usage Summary
+
+				- Interactions: %d
+				- Total tokens: %s
+				- Finished at: %s
+				""".formatted(
+				log.interactionCount(),
+				log.totalTokens() == null ? "N/A" : log.totalTokens().toString(),
+				formatTime(Instant.now()));
+		append(log, text);
 	}
 
 	private void append(ConversationLog log, String text) {

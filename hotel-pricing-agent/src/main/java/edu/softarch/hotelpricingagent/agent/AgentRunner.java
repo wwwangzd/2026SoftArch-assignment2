@@ -20,6 +20,14 @@ import edu.softarch.hotelpricingagent.prompt.PromptBuilder;
 @ConditionalOnProperty(name = "agent.run-on-startup", havingValue = "true", matchIfMissing = true)
 public class AgentRunner implements CommandLineRunner {
 
+	private static final String[] SESSION_STEPS = {
+			"Initial ADD Input Review",
+			"Iteration 1: Establishing an Overall System Structure",
+			"Iteration 2: Identifying Structures to Support Primary Functionality",
+			"Iteration 3: Addressing Reliability and Availability Quality Attributes",
+			"Iteration 4: Addressing Development and Operations"
+	};
+
 	private final AgentProperties properties;
 
 	private final AgentKnowledgeLoader knowledgeLoader;
@@ -56,7 +64,8 @@ public class AgentRunner implements CommandLineRunner {
 			int turn = 1;
 			while (true) {
 				System.out.println();
-				System.out.println("Human message " + turn + " (/send to submit, /exit to quit):");
+				String callName = callName(turn);
+				System.out.println(callName + " (/send to submit, /exit to quit):");
 				String userPrompt = readUserPrompt(reader);
 				if (userPrompt == null) {
 					break;
@@ -66,7 +75,7 @@ public class AgentRunner implements CommandLineRunner {
 				}
 				AgentModelRequest request = new AgentModelRequest(
 						properties.getModelName(),
-						"Human Interaction " + turn,
+						callName,
 						systemPrompt,
 						userPrompt);
 				AgentModelResponse response = modelClient.generate(request);
@@ -100,5 +109,12 @@ public class AgentRunner implements CommandLineRunner {
 
 	private Path normalize(Path path) {
 		return path.toAbsolutePath().normalize();
+	}
+
+	private String callName(int turn) {
+		if (turn <= SESSION_STEPS.length) {
+			return SESSION_STEPS[turn - 1];
+		}
+		return "Follow-up Interaction " + (turn - SESSION_STEPS.length);
 	}
 }
