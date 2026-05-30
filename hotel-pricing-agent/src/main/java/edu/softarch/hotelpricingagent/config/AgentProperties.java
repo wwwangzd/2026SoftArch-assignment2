@@ -18,13 +18,7 @@ public class AgentProperties {
 
 	private Resource systemPromptResource;
 
-	private Resource iterationPromptResource;
-
-	private Resource selfVerificationPromptResource;
-
 	private Path logDir = Path.of("../logs");
-
-	private int maxIterations = 4;
 
 	public boolean isRunOnStartup() {
 		return runOnStartup;
@@ -66,35 +60,11 @@ public class AgentProperties {
 		this.systemPromptResource = systemPromptResource;
 	}
 
-	public Resource getIterationPromptResource() {
-		return iterationPromptResource;
-	}
-
-	public void setIterationPromptResource(Resource iterationPromptResource) {
-		this.iterationPromptResource = iterationPromptResource;
-	}
-
-	public Resource getSelfVerificationPromptResource() {
-		return selfVerificationPromptResource;
-	}
-
-	public void setSelfVerificationPromptResource(Resource selfVerificationPromptResource) {
-		this.selfVerificationPromptResource = selfVerificationPromptResource;
-	}
-
 	public Path getLogDir() {
 		return logDir;
 	}
 
 	public void setLogDir(Path logDir) {
 		this.logDir = logDir;
-	}
-
-	public int getMaxIterations() {
-		return maxIterations;
-	}
-
-	public void setMaxIterations(int maxIterations) {
-		this.maxIterations = maxIterations;
 	}
 }

@@ -17,11 +17,8 @@ public class PromptTemplateLoader {
 		this.properties = properties;
 	}
 
-	public PromptTemplates load() {
-		return new PromptTemplates(
-				read("system prompt", properties.getSystemPromptResource()),
-				read("iteration prompt", properties.getIterationPromptResource()),
-				read("self-verification prompt", properties.getSelfVerificationPromptResource()));
+	public String loadSystemPromptTemplate() {
+		return read("system prompt", properties.getSystemPromptResource());
 	}
 
 	private String read(String name, org.springframework.core.io.Resource resource) {

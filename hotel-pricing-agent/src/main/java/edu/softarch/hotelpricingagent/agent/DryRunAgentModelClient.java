@@ -17,8 +17,8 @@ public class DryRunAgentModelClient implements AgentModelClient {
 				[DRY-RUN RESPONSE]
 
 				Model call was skipped intentionally. This placeholder confirms that the agent
-				can build prompts, preserve the required Qwen3-Max model setting, execute the
-				ADD iteration workflow, and write the conversation log without using external
+				can build prompts, preserve the required Qwen3-Max model setting, accept
+				human-led messages, and write the conversation log without using external
 				domain knowledge.
 
 				Call: %s

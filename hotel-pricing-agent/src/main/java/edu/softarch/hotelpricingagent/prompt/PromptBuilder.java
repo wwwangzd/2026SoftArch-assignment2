@@ -1,10 +1,6 @@
 package edu.softarch.hotelpricingagent.prompt;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-
-import edu.softarch.hotelpricingagent.agent.AddIteration;
 
 @Service
 public class PromptBuilder {
@@ -16,18 +12,7 @@ public class PromptBuilder {
 	}
 
 	public String buildSystemPrompt(String priorKnowledge) {
-		return render(templateLoader.load().systemPrompt(), "priorKnowledge", priorKnowledge);
-	}
-
-	public String buildIterationPrompt(AddIteration iteration, List<String> previousIterationSummaries) {
-		String previousContext = previousIterationSummaries.isEmpty()
-				? "No previous iteration output exists."
-				: String.join("\n\n", previousIterationSummaries);
-		PromptTemplates templates = templateLoader.load();
-		return render(templates.iterationPrompt(),
-				"iterationLabel", iteration.label(),
-				"selfVerificationPrompt", templates.selfVerificationPrompt(),
-				"previousContext", previousContext);
+		return render(templateLoader.loadSystemPromptTemplate(), "priorKnowledge", priorKnowledge);
 	}
 
 	private String render(String template, String... values) {

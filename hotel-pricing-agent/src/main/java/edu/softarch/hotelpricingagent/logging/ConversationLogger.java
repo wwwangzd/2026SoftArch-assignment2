@@ -30,7 +30,7 @@ public class ConversationLogger {
 		this.properties = properties;
 	}
 
-	public ConversationLog start(String modelName, String modelMode) {
+	public ConversationLog start(String systemPrompt) {
 		try {
 			Files.createDirectories(properties.getLogDir());
 			Instant startedAt = Instant.now();
@@ -39,11 +39,14 @@ public class ConversationLogger {
 					# Conversation Log
 
 					- Started at: %s
-					- Model: %s
-					- Model mode: %s
-					- Knowledge resource: %s
 
-					""".formatted(formatTime(startedAt), modelName, modelMode, properties.getKnowledgeResource());
+					## System Prompt
+
+					```text
+					%s
+					```
+
+					""".formatted(formatTime(startedAt), systemPrompt);
 			Files.writeString(path, header, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW);
 			return new ConversationLog(path, startedAt);
 		}
@@ -57,15 +60,6 @@ public class ConversationLogger {
 				## %s
 
 				- Timestamp: %s
-				- Elapsed: %d ms
-				- Prompt tokens: %s
-				- Completion tokens: %s
-
-				### System Prompt
-
-				```text
-				%s
-				```
 
 				### User Prompt
 
@@ -82,10 +76,6 @@ public class ConversationLogger {
 				""".formatted(
 				request.callName(),
 				formatTime(Instant.now()),
-				response.elapsedMillis(),
-				formatNullable(response.promptTokens()),
-				formatNullable(response.completionTokens()),
-				request.systemPrompt(),
 				request.userPrompt(),
 				response.content());
 		append(log, text);
@@ -102,10 +92,6 @@ public class ConversationLogger {
 		catch (IOException ex) {
 			throw new IllegalStateException("Cannot append conversation log: " + log.path(), ex);
 		}
-	}
-
-	private String formatNullable(Integer value) {
-		return value == null ? "N/A" : value.toString();
 	}
 
 	private String formatTime(Instant instant) {
